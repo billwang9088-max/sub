@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人介紹網站 | [您的名字]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 全域設定 --- */
+        :root {
+            --primary-color: #2563eb; /* 主色調 (藍色) */
+            --text-color: #333;       /* 文字顏色 */
+            --bg-color: #f9fafb;      /* 背景顏色 */
+            --card-bg: #ffffff;       /* 卡片背景 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* --- 導覽列 --- */
+        header {
+            background: var(--card-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-links a {
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- 主要區塊通用設定 --- */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        /* --- Hero 區塊 (首頁) --- */
+        #home {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px; /* 避開導覽列 */
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 4px solid var(--primary-color);
+            background-color: #ddd; /* 如果沒圖片時的底色 */
+        }
+
+        .hero-text h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* --- 關於我 --- */
+        .about-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* --- 技能 --- */
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .skill-tag {
+            background: var(--card-bg);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        /* --- 作品集 --- */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-img {
+            width: 100%;
+            height: 200px;
+            background-color: #eee;
+            object-fit: cover;
+        }
+
+        .project-info {
+            padding: 1.5rem;
+        }
+
+        .project-info h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- 聯絡 --- */
+        .contact-info {
+            text-align: center;
+        }
+
+        /* --- 頁尾 --- */
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        /* --- 手機版調整 --- */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none; /* 手機版暫時隱藏選單，可依需求改為漢堡選單 */
+            }
+            
+            nav {
+                justify-content: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">[您的名字]</div>
+            <div class="nav-links">
+                <a href="#home">首頁</a>
+                <a href="#about">關於我</a>
+                <a href="#skills">技能</a>
+                <a href="#portfolio">作品集</a>
+                <a href="#contact">聯絡我</a>
+            </div>
+        </nav>
+    </header>
+
+    <section id="home">
+        <img src="https://via.placeholder.com/150" alt="大頭照" class="profile-img">
+        <div class="hero-text">
+            <h1>你好，我是 [您的名字]</h1>
+            <p>UI/UX 設計師 | 前端工程師 | 數據分析師</p>
+            <a href="#contact" class="btn">聯絡我</a>
+        </div>
+    </section>
+
+    
+
+    <section id="about">
+        <h2>關於我</h2>
+        <div class="about-content">
+            <p>
+                這裡可以寫您的自我介紹。例如：我是一名對網頁開發充滿熱情的工程師，擁有 3 年的相關經驗。
+                我喜歡解決複雜的問題，並致力於創造使用者體驗極佳的產品。<br><br>
+                在工作之餘，我喜歡攝影和閱讀...
+            </p>
+        </div>
+    </section>
+
+    <section id="skills">
+        <h2>專業技能</h2>
+        <div class="skills-grid">
+            <span class="skill-tag">HTML5 / CSS3</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">Photoshop</span>
+            <span class="skill-tag">專案管理</span>
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <h2>精選作品</h2>
+        <div class="portfolio-grid">
+            <div class="project-card">
+                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
+                <div class="project-info">
+                    <h3>作品名稱 A</h3>
+                    <p>簡短說明這個作品在做什麼，使用的技術等。</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
+                <div class="project-info">
+                    <h3>作品名稱 B</h3>
+                    <p>這是另一個很棒的專案說明。</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
+                <div class="project-info">
+                    <h3>作品名稱 C</h3>
+                    <p>展現你的專業能力的說明文字。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>聯絡我</h2>
+        <div class="contact-info">
+            <p>有任何合作機會或問題，歡迎隨時聯繫！</p>
+            <br>
+            <p>📧 Email: <a href="mailto:yourname@example.com" style="color: var(--primary-color);">yourname@example.com</a></p>
+            <p>📱 Phone: 0912-345-678</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 [您的名字]. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
