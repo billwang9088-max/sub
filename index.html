@@ -87,183 +87,201 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
-        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7hJeEXv4aCbcy_56QeBttrqhayKzBvTM",
-            authDomain: "green-1-30461.firebaseapp.com",
-            projectId: "green-1-30461",
-            storageBucket: "green-1-30461.firebasestorage.app",
-            messagingSenderId: "710455398924",
-            appId: "1:710455398924:web:16aab956f5537bcfa61429"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7hJeEXv4aCbcy_56QeBttrqhayKzBvTM",
+        authDomain: "green-1-30461.firebaseapp.com",
+        projectId: "green-1-30461",
+        storageBucket: "green-1-30461.firebasestorage.app",
+        messagingSenderId: "710455398924",
+        appId: "1:710455398924:web:16aab956f5537bcfa61429"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        const functions = getFunctions(app);
-        const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const functions = getFunctions(app);
+    const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
 
-        let confirmationResult = null;
-        let currentUserId = null;
+    let confirmationResult = null;
+    let currentUserId = null;
 
-        // 1. 初始化 Recaptcha 防護 (防濫用核心)
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'normal',
-            'callback': (response) => {
-                document.getElementById('send-code-btn').disabled = false;
-            }
+    // --- 登入控制區 ---
+
+    // 1. 初始化 Recaptcha (顯示在發送按鈕上)
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'normal',
+        'callback': (response) => {
+            document.getElementById('send-code-btn').disabled = false;
+        }
+    });
+
+    // 2. 發送簡訊
+    document.getElementById('send-code-btn').addEventListener('click', async () => {
+        const phoneNumber = document.getElementById('phone-number').value;
+        if (!phoneNumber.startsWith('+886')) {
+            alert("請使用國際格式輸入台灣手機，例如 +886912345678");
+            return;
+        }
+        try {
+            confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+        } catch (error) {
+            console.error(error);
+            alert("發送失敗！請刷新頁面再試一次。");
+            location.reload(); 
+        }
+    });
+
+    // 3. 確認代碼
+    document.getElementById('verify-code-btn').addEventListener('click', async () => {
+        const code = document.getElementById('verification-code').value;
+        try {
+            await confirmationResult.confirm(code);
+            // 成功後 onAuthStateChanged 會自動接手
+        } catch (error) {
+            alert("驗證碼錯誤，請重新確認！");
+        }
+    });
+
+    // 4. 登出功能 (防止 null 狀態卡死)
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => location.reload());
         });
+    }
 
-        // 2. 發送簡訊功能
-        document.getElementById('send-code-btn').addEventListener('click', async () => {
-            const phoneNumber = document.getElementById('phone-number').value;
-            const appVerifier = window.recaptchaVerifier;
+    // 5. 核心：監聽登入狀態 (解決玩家 null 問題)
+    onAuthStateChanged(auth, async (user) => {
+        const authSection = document.getElementById('auth-section');
+        const gameContent = document.getElementById('game-content');
+        const userStatus = document.getElementById('user-status');
+        const logoutBtn = document.getElementById('logout-btn');
 
-            if (!phoneNumber.startsWith('+886')) {
-                alert("請使用國際格式輸入台灣手機，例如 +886912345678");
-                return;
-            }
+        if (user && user.phoneNumber) {
+            currentUserId = user.uid;
+            authSection.style.display = 'none';
+            gameContent.style.display = 'block';
+            if (logoutBtn) logoutBtn.style.display = 'block';
 
-            try {
-                confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-                document.getElementById('step-1').style.display = 'none';
-                document.getElementById('step-2').style.display = 'block';
-            } catch (error) {
-                console.error(error);
-                alert("發送失敗！請檢查號碼格式或是否太頻繁操作。");
-                location.reload(); // 重置 Recaptcha
-            }
-        });
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
 
-        // 3. 確認驗證碼並登入
-        document.getElementById('verify-code-btn').addEventListener('click', async () => {
-            const code = document.getElementById('verification-code').value;
-            try {
-                const result = await confirmationResult.confirm(code);
-                // 登入成功後的邏輯會被 onAuthStateChanged 捕捉
-            } catch (error) {
-                alert("驗證碼錯誤，請重新確認！");
-            }
-        });
+            let score = 0;
+            let name = `玩家${user.phoneNumber.slice(-4)}`;
 
-        // 返回重填
-        document.getElementById('reset-btn').addEventListener('click', () => { location.reload(); });
-
-        // 4. 監聽登入狀態與資料庫處理
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserId = user.uid;
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('game-content').style.display = 'block';
-                
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-
-                if (!userSnap.exists()) {
-                    // 自動創立後端帳號紀錄
-                    await setDoc(userRef, {
-                        displayName: `玩家${user.phoneNumber.slice(-4)}`, // 預設用手機後四碼當暱稱
-                        score: 0,
-                        phone: user.phoneNumber
-                    });
-                }
-                
-                const userData = (await getDoc(userRef)).data();
-                document.getElementById('user-status').innerText = `玩家：${userData.displayName} | ${userData.score} XP`;
-                loadLeaderboard();
+            if (!userSnap.exists()) {
+                await setDoc(userRef, { displayName: name, score: 0, phone: user.phoneNumber });
             } else {
-                document.getElementById('auth-section').style.display = 'block';
-                document.getElementById('game-content').style.display = 'none';
+                const data = userSnap.data();
+                score = data.score || 0;
+                name = data.displayName || name;
             }
-        });
+            userStatus.innerText = `玩家：${name} | ${score} XP`;
+            loadLeaderboard();
+        } else {
+            // 強制切換回登入畫面，避免顯示 null
+            currentUserId = null;
+            authSection.style.display = 'block';
+            gameContent.style.display = 'none';
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            userStatus.innerText = '請先完成手機驗證';
+        }
+    });
 
-        // 5. 排行榜載入
-        async function loadLeaderboard() {
-            const listEl = document.getElementById('leaderboard-list');
-            const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
-            const snap = await getDocs(q);
-            listEl.innerHTML = '';
-            let rank = 1;
-            snap.forEach(doc => {
-                const data = doc.data();
-                listEl.insertAdjacentHTML('beforeend', `
-                    <li class="rank-item" ${doc.id === currentUserId ? 'style="background:#E8F5E9; padding:5px 10px; border-radius:8px;"' : ''}>
-                        <span class="rank-num">${rank}</span>
-                        <div class="player-info">${data.displayName}</div>
-                        <div class="player-score">${data.score} XP</div>
-                    </li>
-                `);
-                rank++;
-            });
+    // --- 排行榜區 ---
+    async function loadLeaderboard() {
+        const listEl = document.getElementById('leaderboard-list');
+        const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
+        const snap = await getDocs(q);
+        listEl.innerHTML = '';
+        let rank = 1;
+        snap.forEach(doc => {
+            const data = doc.data();
+            listEl.insertAdjacentHTML('beforeend', `
+                <li class="rank-item" ${doc.id === currentUserId ? 'style="background:#E8F5E9; padding:5px 10px; border-radius:8px;"' : ''}>
+                    <span class="rank-num">${rank}</span>
+                    <div class="player-info">${data.displayName}</div>
+                    <div class="player-score">${data.score} XP</div>
+                </li>
+            `);
+            rank++;
+        });
+    }
+
+    // --- AI 驗證區 ---
+    window.handleUpload = async (input) => {
+        const file = input.files[0];
+        if (!file || !currentUserId) {
+            alert("請先完成登入！");
+            return;
         }
 
-        // 6. AI 裁判拍照上傳邏輯
-        window.handleUpload = async (input) => {
-            const file = input.files[0];
-            if (!file) return;
+        const card = input.closest('.quest-item');
+        const status = card.querySelector('.upload-status');
+        const img = card.querySelector('.preview-img');
+        const qName = card.querySelector('span').innerText;
+        const xpValue = Number(card.dataset.xp);
 
-            const card = input.closest('.quest-item');
-            const status = card.querySelector('.upload-status');
-            const img = card.querySelector('.preview-img');
-            const qName = card.querySelector('span').innerText;
-            const xpValue = Number(card.dataset.xp);
+        status.style.display = 'block';
+        status.innerText = '🤖 AI 裁判審核中...';
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
 
-            status.style.display = 'block';
-            status.innerText = '🤖 AI 裁判正在審核中...';
-            img.src = URL.createObjectURL(file);
-            img.style.display = 'block';
+        try {
+            const reader = new FileReader();
+            const base64Data = await new Promise(res => {
+                reader.onloadend = () => res(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
 
-            try {
-                // 轉 Base64
-                const reader = new FileReader();
-                const base64Data = await new Promise(res => {
-                    reader.onloadend = () => res(reader.result.split(',')[1]);
-                    reader.readAsDataURL(file);
+            // 呼叫雲端 AI API
+            const response = await verifyQuestImageAPI({
+                base64Image: base64Data,
+                mimeType: file.type,
+                questName: qName
+            });
+
+            if (response.data.result.includes("PASS")) {
+                status.innerText = '✅ AI 判定通過！正在同步分數...';
+                
+                // 1. 上傳 Storage
+                const storageRef = ref(storage, `verifications/${currentUserId}/${Date.now()}_${file.name}`);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+
+                // 2. 寫入 Verifications 紀錄
+                await addDoc(collection(db, "verifications"), {
+                    userId: currentUserId, status: "approved", imageUrl: url, timestamp: serverTimestamp()
                 });
 
-                // 呼叫後端 API
-                const response = await verifyQuestImageAPI({
-                    base64Image: base64Data,
-                    mimeType: file.type,
-                    questName: qName
-                });
+                // 3. 更新 User 總分
+                const userRef = doc(db, "users", currentUserId);
+                const userSnap = await getDoc(userRef);
+                const newScore = (userSnap.data().score || 0) + xpValue;
+                await setDoc(userRef, { score: newScore }, { merge: true });
 
-                if (response.data.result.includes("PASS")) {
-                    status.innerText = '✅ AI 判定通過！加分中...';
-                    
-                    // 存圖片
-                    const storageRef = ref(storage, `verifications/${currentUserId}/${Date.now()}_${file.name}`);
-                    await uploadBytes(storageRef, file);
-                    const url = await getDownloadURL(storageRef);
-
-                    // 寫紀錄
-                    await addDoc(collection(db, "verifications"), {
-                        userId: currentUserId, status: "approved", imageUrl: url, timestamp: serverTimestamp()
-                    });
-
-                    // 更新分數
-                    const userRef = doc(db, "users", currentUserId);
-                    const userSnap = await getDoc(userRef);
-                    const newScore = (userSnap.data().score || 0) + xpValue;
-                    await setDoc(userRef, { score: newScore }, { merge: true });
-
-                    status.innerText = `🎉 恭喜通過！獲得 ${xpValue} XP`;
-                    loadLeaderboard();
-                } else {
-                    status.innerText = '❌ AI 覺得照片不符合任務要求，請重拍！';
-                }
-            } catch (err) {
-                console.error(err);
-                status.innerText = '❌ 系統出錯，請稍後再試';
+                status.innerText = `🎉 恭喜通過！獲得 ${xpValue} XP`;
+                // 更新頂端狀態列與排行榜
+                document.getElementById('user-status').innerText = `玩家：玩家${auth.currentUser.phoneNumber.slice(-4)} | ${newScore} XP`;
+                loadLeaderboard();
+            } else {
+                status.innerText = '❌ AI 判定失敗，照片內容與任務不符。';
             }
-        };
-    </script>
+        } catch (err) {
+            console.error("AI 驗證出錯:", err);
+            status.innerText = '❌ 系統異常，請檢查登入狀態或權限設定';
+        }
+    };
+</script>
 </body>
 </html>
