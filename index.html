@@ -104,20 +104,18 @@
     };
 
  // 找到這幾行
+// 1. 初始化 Firebase 核心 (這幾行全案只能出現一次！)
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// 🌟 請修改這兩行：明確指定地區為 'us-central1'
+// 2. 初始化 Functions (明確指定地區 us-central1)
 const functions = getFunctions(app, 'us-central1'); 
 const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
-    // ... 其他初始化 ...
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-// 🌟 加上這行宣告，給它一個初始值
+// 3. 宣告全域變數 (用 let 讓後面的登入邏輯可以改寫它們)
+let confirmationResult = null;
 let currentUserId = null;
 
     // --- 登入控制區 ---
