@@ -1,312 +1,291 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人介紹網站 | [您的名字]</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>永續戰場 | 每日任務與排行</title>
     <style>
-        /* --- 全域設定 --- */
         :root {
-            --primary-color: #2563eb; /* 主色調 (藍色) */
-            --text-color: #333;       /* 文字顏色 */
-            --bg-color: #f9fafb;      /* 背景顏色 */
-            --card-bg: #ffffff;       /* 卡片背景 */
+            --primary: #2E8B57;
+            --secondary: #E8F5E9;
+            --bg-color: #F8F9FA;
+            --text-color: #333;
+            --card-bg: #FFFFFF;
+            --accent: #FF5722;
         }
 
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
         }
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            line-height: 1.6;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        /* --- 導覽列 --- */
         header {
-            background: var(--card-bg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        nav {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .nav-links a {
-            margin-left: 2rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* --- 主要區塊通用設定 --- */
-        section {
-            padding: 5rem 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: var(--primary-color);
-        }
-
-        /* --- Hero 區塊 (首頁) --- */
-        #home {
-            height: 100vh;
+        .quest-item {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding-top: 80px; /* 避開導覽列 */
+            gap: 0.8rem;
         }
 
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 1.5rem;
-            border: 4px solid var(--primary-color);
-            background-color: #ddd; /* 如果沒圖片時的底色 */
-        }
-
-        .hero-text h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero-text p {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #1d4ed8;
-        }
-
-        /* --- 關於我 --- */
-        .about-content {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        /* --- 技能 --- */
-        .skills-grid {
+        .quest-header {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
+            justify-content: space-between;
+            font-weight: bold;
         }
 
-        .skill-tag {
-            background: var(--card-bg);
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-weight: 500;
-        }
-
-        /* --- 作品集 --- */
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .project-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .project-img {
-            width: 100%;
-            height: 200px;
-            background-color: #eee;
-            object-fit: cover;
-        }
-
-        .project-info {
-            padding: 1.5rem;
-        }
-
-        .project-info h3 {
-            margin-bottom: 0.5rem;
-        }
-
-        /* --- 聯絡 --- */
-        .contact-info {
-            text-align: center;
-        }
-
-        /* --- 頁尾 --- */
-        footer {
-            background: #333;
+        .xp-badge {
+            background-color: var(--accent);
             color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
         }
 
-        /* --- 手機版調整 --- */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; /* 手機版暫時隱藏選單，可依需求改為漢堡選單 */
-            }
-            
-            nav {
-                justify-content: center;
-            }
+        .verify-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            width: 100%;
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
 
-            .hero-text h1 {
-                font-size: 2rem;
-            }
+        .verify-btn:active {
+            transform: scale(0.98);
+        }
+
+        .verify-input {
+            display: none;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            border-radius: 8px;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .upload-status {
+            font-size: 0.85rem;
+            color: #FF5722;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .leaderboard {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #EEE;
+        }
+
+        .rank-num {
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 30px;
+            color: #888;
+        }
+
+        .rank-num.top-1 { color: #FFD700; }
+        .rank-num.top-2 { color: #C0C0C0; }
+        .rank-num.top-3 { color: #CD7F32; }
+
+        .player-info {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+
+        .player-score {
+            font-weight: bold;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <nav>
-            <div class="logo">[您的名字]</div>
-            <div class="nav-links">
-                <a href="#home">首頁</a>
-                <a href="#about">關於我</a>
-                <a href="#skills">技能</a>
-                <a href="#portfolio">作品集</a>
-                <a href="#contact">聯絡我</a>
-            </div>
-        </nav>
+        <h2 style="margin:0;">🌿 永續戰場</h2>
+        <p style="margin:5px 0 0; font-size: 0.9rem;">目前賽季積分：<span id="my-score">2150</span> XP</p>
     </header>
 
-    <section id="home">
-        <img src="https://via.placeholder.com/150" alt="大頭照" class="profile-img">
-        <div class="hero-text">
-            <h1>你好，我是 [您的名字]</h1>
-            <p>UI/UX 設計師 | 前端工程師 | 數據分析師</p>
-            <a href="#contact" class="btn">聯絡我</a>
-        </div>
-    </section>
-
-    
-
-    <section id="about">
-        <h2>關於我</h2>
-        <div class="about-content">
-            <p>
-                這裡可以寫您的自我介紹。例如：我是一名對網頁開發充滿熱情的工程師，擁有 3 年的相關經驗。
-                我喜歡解決複雜的問題，並致力於創造使用者體驗極佳的產品。<br><br>
-                在工作之餘，我喜歡攝影和閱讀...
-            </p>
-        </div>
-    </section>
-
-    <section id="skills">
-        <h2>專業技能</h2>
-        <div class="skills-grid">
-            <span class="skill-tag">HTML5 / CSS3</span>
-            <span class="skill-tag">JavaScript</span>
-            <span class="skill-tag">Python</span>
-            <span class="skill-tag">React.js</span>
-            <span class="skill-tag">Photoshop</span>
-            <span class="skill-tag">專案管理</span>
-        </div>
-    </section>
-
-    <section id="portfolio">
-        <h2>精選作品</h2>
-        <div class="portfolio-grid">
-            <div class="project-card">
-                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
-                <div class="project-info">
-                    <h3>作品名稱 A</h3>
-                    <p>簡短說明這個作品在做什麼，使用的技術等。</p>
-                </div>
+    <div class="container">
+        
+        <div class="card">
+            <div class="section-title">
+                <h3 style="margin:0;">🔥 今日隨機任務</h3>
+                <span style="font-size:0.9rem; color:#666;">重置時間: 02:59:30</span>
             </div>
-            <div class="project-card">
-                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
-                <div class="project-info">
-                    <h3>作品名稱 B</h3>
-                    <p>這是另一個很棒的專案說明。</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <img src="https://via.placeholder.com/400x200" alt="作品圖片" class="project-img">
-                <div class="project-info">
-                    <h3>作品名稱 C</h3>
-                    <p>展現你的專業能力的說明文字。</p>
+            
+            <div id="quest-container">
+                <div class="quest-item" data-quest-id="quest_001" data-xp="300">
+                    <div class="quest-header">
+                        <span>外帶使用自備環保容器</span>
+                        <span class="xp-badge">+300 XP</span>
+                    </div>
+                    <p style="margin:0; font-size:0.9rem; color:#555;">防作弊驗證：請拍下裝有食物的環保餐具照片。</p>
+                    
+                    <label class="verify-btn">
+                        📷 拍照驗證
+                        <input type="file" accept="image/*" capture="environment" class="verify-input">
+                    </label>
+                    <div class="upload-status">上傳中...</div>
+                    <img class="preview-img" alt="驗證照片預覽">
                 </div>
             </div>
         </div>
-    </section>
 
-    <section id="contact">
-        <h2>聯絡我</h2>
-        <div class="contact-info">
-            <p>有任何合作機會或問題，歡迎隨時聯繫！</p>
-            <br>
-            <p>📧 Email: <a href="mailto:yourname@example.com" style="color: var(--primary-color);">yourname@example.com</a></p>
-            <p>📱 Phone: 0912-345-678</p>
+        <div class="card">
+            <div class="section-title">
+                <h3 style="margin:0;">🏆 聯盟排行榜</h3>
+            </div>
+            <ul class="leaderboard">
+                <li class="rank-item">
+                    <span class="rank-num top-1">1</span>
+                    <div class="player-info">郭思涵</div>
+                    <div class="player-score">9500 XP</div>
+                </li>
+                <li class="rank-item">
+                    <span class="rank-num top-2">2</span>
+                    <div class="player-info">廖和風</div>
+                    <div class="player-score">8200 XP</div>
+                </li>
+                <li class="rank-item" style="background-color: var(--secondary); border-radius: 8px; padding: 0.8rem;">
+                    <span class="rank-num top-3">3</span>
+                    <div class="player-info" style="font-weight: bold;">(你)</div>
+                    <div class="player-score">2150 XP</div>
+                </li>
+            </ul>
         </div>
-    </section>
+    </div>
 
-    <footer>
-        <p>&copy; 2024 [您的名字]. All Rights Reserved.</p>
-    </footer>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        // 引入 Storage 與 Firestore 功能
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+        // 你的 Firebase 設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7hJeEXv4aCbcy_56QeBttrqhayKzBvTM",
+            authDomain: "green-1-30461.firebaseapp.com",
+            projectId: "green-1-30461",
+            storageBucket: "green-1-30461.firebasestorage.app",
+            messagingSenderId: "710455398924",
+            appId: "1:710455398924:web:16aab956f5537bcfa61429",
+            measurementId: "G-3TJM9VRQQW"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        const db = getFirestore(app);
+
+        // 模擬當前使用者 ID (之後可用 Firebase Auth 替換)
+        const currentUserId = "user_12345"; 
+
+        // 綁定所有上傳按鈕的事件
+        document.querySelectorAll('.verify-input').forEach(input => {
+            input.addEventListener('change', async function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const questItem = this.closest('.quest-item');
+                const btnLabel = questItem.querySelector('.verify-btn');
+                const imgPreview = questItem.querySelector('.preview-img');
+                const statusText = questItem.querySelector('.upload-status');
+                
+                const questId = questItem.getAttribute('data-quest-id');
+                const xpValue = questItem.getAttribute('data-xp');
+
+                // 1. 前端預覽照片並更改 UI 狀態
+                imgPreview.src = URL.createObjectURL(file);
+                imgPreview.style.display = 'block';
+                btnLabel.style.display = 'none'; // 隱藏按鈕
+                statusText.style.display = 'block'; // 顯示上傳中
+
+                try {
+                    // 2. 上傳照片到 Firebase Storage
+                    const fileExtension = file.name.split('.').pop();
+                    const fileName = `verifications/${currentUserId}/${questId}_${Date.now()}.${fileExtension}`;
+                    const storageRef = ref(storage, fileName);
+                    
+                    // 執行上傳
+                    await uploadBytes(storageRef, file);
+                    
+                    // 取得圖片的公開網址
+                    const downloadURL = await getDownloadURL(storageRef);
+                    console.log('圖片上傳成功:', downloadURL);
+
+                    // 3. 將紀錄寫入 Firestore (等待審核狀態)
+                    await addDoc(collection(db, "verifications"), {
+                        userId: currentUserId,
+                        questId: questId,
+                        xpReward: Number(xpValue),
+                        imageUrl: downloadURL,
+                        status: "pending", // pending(待審核), approved(通過), rejected(退回)
+                        timestamp: serverTimestamp()
+                    });
+
+                    // 4. 更新 UI 顯示完成
+                    statusText.innerText = '✅ 照片已上傳，等待審核給分！';
+                    statusText.style.color = '#2E8B57';
+
+                } catch (error) {
+                    console.error("上傳失敗:", error);
+                    statusText.innerText = '❌ 上傳失敗，請重試';
+                    btnLabel.style.display = 'block'; // 恢復按鈕
+                }
+            });
+        });
+    </script>
 </body>
 </html>
