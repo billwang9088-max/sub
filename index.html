@@ -3,27 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>永續戰場 | 每日任務與排行</title>
+    <title>永續戰場 | 手機強效驗證版</title>
     <style>
-        /* CSS 保持不變，為了版面簡潔我省略列出，請保留你原本的 <style> 內容 */
+        /* CSS 保持你原本的風格，並針對手機登入介面進行優化 */
         :root { --primary: #2E8B57; --secondary: #E8F5E9; --bg-color: #F8F9FA; --text-color: #333; --card-bg: #FFFFFF; --accent: #FF5722; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
         header { background-color: var(--primary); color: white; padding: 1.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
-        .login-btn { position: absolute; top: 1.5rem; right: 1rem; background: white; color: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold; cursor: pointer; display: none; }
         .container { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
         .card { background-color: var(--card-bg); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        
+        /* 登入視窗專屬樣式 */
+        .auth-card { text-align: center; padding: 2rem; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; transition: 0.3s; margin-top: 10px; }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
+        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+        
+        /* 遊戲介面預設隱藏 */
+        #game-content { display: none; }
+
+        /* 原有樣式保持 */
         .section-title { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--secondary); padding-bottom: 0.5rem; margin-bottom: 1rem; }
-        .quest-item { background-color: var(--secondary); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+        .quest-item { background-color: var(--secondary); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
         .quest-header { display: flex; justify-content: space-between; font-weight: bold; }
         .xp-badge { background-color: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.85rem; }
-        .verify-btn { background-color: var(--primary); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; display: block; width: 100%; box-sizing: border-box; }
-        .verify-input { display: none; }
-        .preview-img { max-width: 100%; border-radius: 8px; display: none; margin-top: 0.5rem; }
-        .upload-status { font-size: 0.85rem; color: #FF5722; font-weight: bold; text-align: center; display: none; }
-        .leaderboard { list-style: none; padding: 0; margin: 0; }
+        .verify-btn { background-color: var(--primary); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; display: block; width: 100%; margin-top: 10px; }
+        .preview-img { max-width: 100%; border-radius: 8px; display: none; margin-top: 10px; }
+        .upload-status { font-size: 0.85rem; color: #FF5722; font-weight: bold; text-align: center; margin-top: 10px; }
+        .leaderboard { list-style: none; padding: 0; }
         .rank-item { display: flex; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #EEE; }
         .rank-num { font-size: 1.2rem; font-weight: bold; width: 30px; color: #888; }
-        .rank-num.top-1 { color: #FFD700; } .rank-num.top-2 { color: #C0C0C0; } .rank-num.top-3 { color: #CD7F32; }
         .player-info { flex-grow: 1; margin-left: 10px; }
         .player-score { font-weight: bold; color: var(--primary); }
     </style>
@@ -32,16 +41,31 @@
 
     <header>
         <h2 style="margin:0;">🌿 永續戰場</h2>
-        <button id="login-btn" class="login-btn">Google 登入</button>
-        <p style="margin:5px 0 0; font-size: 0.9rem;" id="user-status">請先登入以載入積分</p>
+        <p style="margin:5px 0 0; font-size: 0.9rem;" id="user-status">驗證身份以守護地球</p>
     </header>
 
     <div class="container">
-        <div class="card">
-            <div class="section-title">
-                <h3 style="margin:0;">🔥 今日隨機任務</h3>
+        <div class="card auth-card" id="auth-section">
+            <h3 style="margin-top:0;">📱 簡訊驗證註冊</h3>
+            <p style="font-size:0.85rem; color:#666;">為確保公平性，一個號碼僅能創建一個帳號</p>
+            
+            <div id="step-1">
+                <input type="tel" id="phone-number" placeholder="手機號碼 (例: +886912345678)">
+                <div id="recaptcha-container"></div>
+                <button id="send-code-btn" class="btn-main">發送驗證碼</button>
             </div>
-            <div id="quest-container">
+
+            <div id="step-2" style="display:none;">
+                <p style="color:var(--primary); font-weight:bold;">驗證碼已發送！</p>
+                <input type="text" id="verification-code" placeholder="請輸入 6 位數驗證碼">
+                <button id="verify-code-btn" class="btn-main" style="background:var(--accent);">確認登入</button>
+                <button id="reset-btn" style="background:none; border:none; color:#888; cursor:pointer; margin-top:10px;">號碼填錯了？按此返回</button>
+            </div>
+        </div>
+
+        <div id="game-content">
+            <div class="card">
+                <div class="section-title"><h3>🔥 今日隨機任務</h3></div>
                 <div class="quest-item" data-quest-id="quest_001" data-xp="300">
                     <div class="quest-header">
                         <span>外帶使用自備環保容器</span>
@@ -49,30 +73,26 @@
                     </div>
                     <label class="verify-btn">
                         📷 拍照驗證
-                        <input type="file" accept="image/*" capture="environment" class="verify-input">
+                        <input type="file" accept="image/*" capture="environment" class="verify-input" onchange="handleUpload(this)">
                     </label>
-                    <div class="upload-status">上傳中...</div>
-                    <img class="preview-img" alt="驗證照片預覽">
+                    <div class="upload-status" style="display:none;">🤖 AI 裁判正在審核中...</div>
+                    <img class="preview-img" alt="預覽">
                 </div>
             </div>
-        </div>
 
-        <div class="card">
-            <div class="section-title">
-                <h3 style="margin:0;">🏆 聯盟排行榜</h3>
+            <div class="card">
+                <div class="section-title"><h3>🏆 聯盟排行榜</h3></div>
+                <ul class="leaderboard" id="leaderboard-list"></ul>
             </div>
-            <ul class="leaderboard" id="leaderboard-list">
-                <li class="rank-item">等待登入中...</li>
-            </ul>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
-        // 新增 Firebase Auth 模組
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7hJeEXv4aCbcy_56QeBttrqhayKzBvTM",
@@ -80,151 +100,170 @@
             projectId: "green-1-30461",
             storageBucket: "green-1-30461.firebasestorage.app",
             messagingSenderId: "710455398924",
-            appId: "1:710455398924:web:16aab956f5537bcfa61429",
-            measurementId: "G-3TJM9VRQQW"
+            appId: "1:710455398924:web:16aab956f5537bcfa61429"
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        const functions = getFunctions(app);
+        const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
 
-        let currentUserId = null; 
+        let confirmationResult = null;
+        let currentUserId = null;
 
-        // 處理登入按鈕點擊
-        const loginBtn = document.getElementById('login-btn');
-        loginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch(error => {
-                console.error("登入失敗:", error);
-                alert("登入失敗，請重試！");
-            });
-        });
-
-        // 監聽登入狀態變化
-        onAuthStateChanged(auth, async (user) => {
-            const statusText = document.getElementById('user-status');
-            
-            if (user) {
-                // 已登入
-                currentUserId = user.uid;
-                loginBtn.style.display = 'none';
-                statusText.innerText = `玩家：${user.displayName} | 載入中...`;
-
-                // 檢查資料庫有沒有這個玩家，沒有就自動建立 (預設 0 分)
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                
-                if (!userSnap.exists()) {
-                    await setDoc(userRef, {
-                        displayName: user.displayName,
-                        score: 0
-                    });
-                    statusText.innerText = `玩家：${user.displayName} | 0 XP`;
-                } else {
-                    statusText.innerText = `玩家：${user.displayName} | ${userSnap.data().score} XP`;
-                }
-
-                // 登入後才載入排行榜
-                loadLeaderboard();
-            } else {
-                // 未登入
-                currentUserId = null;
-                loginBtn.style.display = 'block';
-                statusText.innerText = '請先登入以載入積分';
-                document.getElementById('leaderboard-list').innerHTML = '<li class="rank-item">請先登入以查看排行榜</li>';
+        // 1. 初始化 Recaptcha 防護 (防濫用核心)
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'normal',
+            'callback': (response) => {
+                document.getElementById('send-code-btn').disabled = false;
             }
         });
 
-        // 載入排行榜函數
-        async function loadLeaderboard() {
-            const leaderboardEl = document.getElementById('leaderboard-list');
-            leaderboardEl.innerHTML = '<li class="rank-item">載入排行榜中...</li>';
+        // 2. 發送簡訊功能
+        document.getElementById('send-code-btn').addEventListener('click', async () => {
+            const phoneNumber = document.getElementById('phone-number').value;
+            const appVerifier = window.recaptchaVerifier;
+
+            if (!phoneNumber.startsWith('+886')) {
+                alert("請使用國際格式輸入台灣手機，例如 +886912345678");
+                return;
+            }
 
             try {
-                const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
-                
-                leaderboardEl.innerHTML = ''; 
-                let rank = 1;
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const isMe = doc.id === currentUserId; 
-                    
-                    let rankClass = "rank-num";
-                    if (rank === 1) rankClass += " top-1";
-                    else if (rank === 2) rankClass += " top-2";
-                    else if (rank === 3) rankClass += " top-3";
-
-                    const itemStyle = isMe ? 'style="background-color: var(--secondary); border-radius: 8px; padding: 0.8rem;"' : '';
-                    const nameStyle = isMe ? 'style="font-weight: bold;"' : '';
-
-                    const li = `
-                        <li class="rank-item" ${itemStyle}>
-                            <span class="${rankClass}">${rank}</span>
-                            <div class="player-info" ${nameStyle}>${data.displayName}</div>
-                            <div class="player-score">${data.score} XP</div>
-                        </li>
-                    `;
-                    leaderboardEl.insertAdjacentHTML('beforeend', li);
-                    rank++;
-                });
+                confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('step-2').style.display = 'block';
             } catch (error) {
-                console.error("讀取排行榜失敗:", error);
+                console.error(error);
+                alert("發送失敗！請檢查號碼格式或是否太頻繁操作。");
+                location.reload(); // 重置 Recaptcha
             }
+        });
+
+        // 3. 確認驗證碼並登入
+        document.getElementById('verify-code-btn').addEventListener('click', async () => {
+            const code = document.getElementById('verification-code').value;
+            try {
+                const result = await confirmationResult.confirm(code);
+                // 登入成功後的邏輯會被 onAuthStateChanged 捕捉
+            } catch (error) {
+                alert("驗證碼錯誤，請重新確認！");
+            }
+        });
+
+        // 返回重填
+        document.getElementById('reset-btn').addEventListener('click', () => { location.reload(); });
+
+        // 4. 監聽登入狀態與資料庫處理
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('game-content').style.display = 'block';
+                
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists()) {
+                    // 自動創立後端帳號紀錄
+                    await setDoc(userRef, {
+                        displayName: `玩家${user.phoneNumber.slice(-4)}`, // 預設用手機後四碼當暱稱
+                        score: 0,
+                        phone: user.phoneNumber
+                    });
+                }
+                
+                const userData = (await getDoc(userRef)).data();
+                document.getElementById('user-status').innerText = `玩家：${userData.displayName} | ${userData.score} XP`;
+                loadLeaderboard();
+            } else {
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('game-content').style.display = 'none';
+            }
+        });
+
+        // 5. 排行榜載入
+        async function loadLeaderboard() {
+            const listEl = document.getElementById('leaderboard-list');
+            const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
+            const snap = await getDocs(q);
+            listEl.innerHTML = '';
+            let rank = 1;
+            snap.forEach(doc => {
+                const data = doc.data();
+                listEl.insertAdjacentHTML('beforeend', `
+                    <li class="rank-item" ${doc.id === currentUserId ? 'style="background:#E8F5E9; padding:5px 10px; border-radius:8px;"' : ''}>
+                        <span class="rank-num">${rank}</span>
+                        <div class="player-info">${data.displayName}</div>
+                        <div class="player-score">${data.score} XP</div>
+                    </li>
+                `);
+                rank++;
+            });
         }
 
-        // 拍照上傳邏輯 (加入必須登入的檢查)
-        document.querySelectorAll('.verify-input').forEach(input => {
-            input.addEventListener('change', async function(event) {
-                if (!currentUserId) {
-                    alert("請先登入才能解鎖任務！");
-                    this.value = ''; // 清空選擇的檔案
-                    return;
-                }
-                
-                const file = event.target.files[0];
-                if (!file) return;
+        // 6. AI 裁判拍照上傳邏輯
+        window.handleUpload = async (input) => {
+            const file = input.files[0];
+            if (!file) return;
 
-                const questItem = this.closest('.quest-item');
-                const btnLabel = questItem.querySelector('.verify-btn');
-                const imgPreview = questItem.querySelector('.preview-img');
-                const statusText = questItem.querySelector('.upload-status');
-                const questId = questItem.getAttribute('data-quest-id');
-                const xpValue = questItem.getAttribute('data-xp');
+            const card = input.closest('.quest-item');
+            const status = card.querySelector('.upload-status');
+            const img = card.querySelector('.preview-img');
+            const qName = card.querySelector('span').innerText;
+            const xpValue = Number(card.dataset.xp);
 
-                imgPreview.src = URL.createObjectURL(file);
-                imgPreview.style.display = 'block';
-                btnLabel.style.display = 'none'; 
-                statusText.style.display = 'block'; 
+            status.style.display = 'block';
+            status.innerText = '🤖 AI 裁判正在審核中...';
+            img.src = URL.createObjectURL(file);
+            img.style.display = 'block';
 
-                try {
-                    const fileExtension = file.name.split('.').pop();
-                    const fileName = `verifications/${currentUserId}/${questId}_${Date.now()}.${fileExtension}`;
-                    const storageRef = ref(storage, fileName);
+            try {
+                // 轉 Base64
+                const reader = new FileReader();
+                const base64Data = await new Promise(res => {
+                    reader.onloadend = () => res(reader.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+
+                // 呼叫後端 API
+                const response = await verifyQuestImageAPI({
+                    base64Image: base64Data,
+                    mimeType: file.type,
+                    questName: qName
+                });
+
+                if (response.data.result.includes("PASS")) {
+                    status.innerText = '✅ AI 判定通過！加分中...';
                     
+                    // 存圖片
+                    const storageRef = ref(storage, `verifications/${currentUserId}/${Date.now()}_${file.name}`);
                     await uploadBytes(storageRef, file);
-                    const downloadURL = await getDownloadURL(storageRef);
+                    const url = await getDownloadURL(storageRef);
 
+                    // 寫紀錄
                     await addDoc(collection(db, "verifications"), {
-                        userId: currentUserId,
-                        questId: questId,
-                        xpReward: Number(xpValue),
-                        imageUrl: downloadURL,
-                        status: "pending", 
-                        timestamp: serverTimestamp()
+                        userId: currentUserId, status: "approved", imageUrl: url, timestamp: serverTimestamp()
                     });
 
-                    statusText.innerText = '✅ 照片已上傳，等待審核給分！';
-                    statusText.style.color = '#2E8B57';
-                } catch (error) {
-                    console.error("上傳失敗:", error);
-                    statusText.innerText = '❌ 上傳失敗，請重試';
-                    btnLabel.style.display = 'block'; 
+                    // 更新分數
+                    const userRef = doc(db, "users", currentUserId);
+                    const userSnap = await getDoc(userRef);
+                    const newScore = (userSnap.data().score || 0) + xpValue;
+                    await setDoc(userRef, { score: newScore }, { merge: true });
+
+                    status.innerText = `🎉 恭喜通過！獲得 ${xpValue} XP`;
+                    loadLeaderboard();
+                } else {
+                    status.innerText = '❌ AI 覺得照片不符合任務要求，請重拍！';
                 }
-            });
-        });
+            } catch (err) {
+                console.error(err);
+                status.innerText = '❌ 系統出錯，請稍後再試';
+            }
+        };
     </script>
 </body>
 </html>
