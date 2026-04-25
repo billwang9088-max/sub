@@ -3,275 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>永續未來 | 互動體驗</title>
+    <title>永續戰場 | 每日任務與排行</title>
     <style>
-        /* 定義全域 CSS 變數，方便切換主題 */
-        :root {
-            --primary: #2E8B57; /* 海洋綠 */
-            --bg-color: #F5F5F0;
-            --text-color: #333;
-            --card-bg: #FFFFFF;
-        }
-        
-        /* 透過屬性選取器設定深色模式變數 */
-        [data-theme="dark"] {
-            --primary: #4CAF50;
-            --bg-color: #1A1A1A;
-            --text-color: #E0E0E0;
-            --card-bg: #2D2D2D;
-        }
-        
-        body {
-            font-family: 'Helvetica Neue', Arial, 'LiHei Pro', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-        
-        header {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, rgba(46,139,87,0.1), rgba(46,139,87,0.3));
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            color: var(--primary);
-            letter-spacing: 2px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: -2rem auto 2rem; /* 利用負邊距讓內容稍微覆蓋 header */
-            padding: 0 1.5rem;
-            position: relative;
-        }
-        
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 2.5rem;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-            margin-bottom: 2rem;
-            transition: transform 0.2s, background-color 0.4s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-3px);
-        }
-        
-        /* 互動按鈕樣式 */
-        .theme-toggle {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
-        }
-        
-        /* 互動式 Checkbox 清單 */
-        .checklist {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .checklist li {
-            margin: 1.2rem 0;
-            display: flex;
-            align-items: center;
-            font-size: 1.1rem;
-        }
-        
-        input[type="checkbox"] {
-            margin-right: 15px;
-            width: 22px;
-            height: 22px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-        
-        /* 動態進度條 */
-        .progress-container {
-            width: 100%;
-            background-color: #E0E0E0;
-            border-radius: 10px;
-            margin-top: 2rem;
-            height: 20px;
-            overflow: hidden;
-        }
-        
-        [data-theme="dark"] .progress-container {
-            background-color: #444;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--primary);
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑動畫效果 */
-        }
-        
-        .score-display {
-            text-align: right;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-top: 0.5rem;
-            color: var(--primary);
-        }
-        
-        /* 永續建築概念 Grid */
-        .arch-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        
-        .arch-item {
-            padding: 1rem;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .arch-item:hover {
-            background-color: rgba(46,139,87,0.1);
-        }
-        
-        .arch-item.active {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .arch-info {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: rgba(46,139,87,0.08);
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            display: none; /* 初始隱藏，點擊後透過 JS 顯示 */
-            line-height: 1.6;
-        }
+        /* CSS 保持不變，為了版面簡潔我省略列出，請保留你原本的 <style> 內容 */
+        :root { --primary: #2E8B57; --secondary: #E8F5E9; --bg-color: #F8F9FA; --text-color: #333; --card-bg: #FFFFFF; --accent: #FF5722; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        header { background-color: var(--primary); color: white; padding: 1.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+        .login-btn { position: absolute; top: 1.5rem; right: 1rem; background: white; color: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold; cursor: pointer; display: none; }
+        .container { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background-color: var(--card-bg); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--secondary); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .quest-item { background-color: var(--secondary); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+        .quest-header { display: flex; justify-content: space-between; font-weight: bold; }
+        .xp-badge { background-color: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.85rem; }
+        .verify-btn { background-color: var(--primary); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; display: block; width: 100%; box-sizing: border-box; }
+        .verify-input { display: none; }
+        .preview-img { max-width: 100%; border-radius: 8px; display: none; margin-top: 0.5rem; }
+        .upload-status { font-size: 0.85rem; color: #FF5722; font-weight: bold; text-align: center; display: none; }
+        .leaderboard { list-style: none; padding: 0; margin: 0; }
+        .rank-item { display: flex; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #EEE; }
+        .rank-num { font-size: 1.2rem; font-weight: bold; width: 30px; color: #888; }
+        .rank-num.top-1 { color: #FFD700; } .rank-num.top-2 { color: #C0C0C0; } .rank-num.top-3 { color: #CD7F32; }
+        .player-info { flex-grow: 1; margin-left: 10px; }
+        .player-score { font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" onclick="toggleTheme()">切換日/夜間模式</button>
-
     <header>
-        <h1>永續環境與綠色生活</h1>
-        <p>探索如何在日常與空間設計中實踐永續理念</p>
+        <h2 style="margin:0;">🌿 永續戰場</h2>
+        <button id="login-btn" class="login-btn">Google 登入</button>
+        <p style="margin:5px 0 0; font-size: 0.9rem;" id="user-status">請先登入以載入積分</p>
     </header>
 
     <div class="container">
         <div class="card">
-            <h2>🌱 你的綠色生活指數</h2>
-            <p>勾選你今天完成的永續小習慣，看看你的影響力：</p>
-            <ul class="checklist" id="habit-list">
-                <li><input type="checkbox" onchange="updateScore()"> 攜帶環保杯與環保餐具</li>
-                <li><input type="checkbox" onchange="updateScore()"> 選擇搭乘大眾運輸或騎自行車</li>
-                <li><input type="checkbox" onchange="updateScore()"> 確實做好垃圾分類與資源回收</li>
-                <li><input type="checkbox" onchange="updateScore()"> 離開房間時隨手關閉電源與冷氣</li>
-                <li><input type="checkbox" onchange="updateScore()"> 減少列印紙張，多使用數位筆記與檔案</li>
-            </ul>
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
+            <div class="section-title">
+                <h3 style="margin:0;">🔥 今日隨機任務</h3>
             </div>
-            <div class="score-display" id="score-text">完成度：0%</div>
+            <div id="quest-container">
+                <div class="quest-item" data-quest-id="quest_001" data-xp="300">
+                    <div class="quest-header">
+                        <span>外帶使用自備環保容器</span>
+                        <span class="xp-badge">+300 XP</span>
+                    </div>
+                    <label class="verify-btn">
+                        📷 拍照驗證
+                        <input type="file" accept="image/*" capture="environment" class="verify-input">
+                    </label>
+                    <div class="upload-status">上傳中...</div>
+                    <img class="preview-img" alt="驗證照片預覽">
+                </div>
+            </div>
         </div>
 
         <div class="card">
-            <h2>🏛️ 永續空間設計</h2>
-            <p>點擊下方元素，了解如何透過設計降低建築對環境的負擔：</p>
-            <div class="arch-grid">
-                <div class="arch-item" onclick="showInfo('passive', this)">被動式設計</div>
-                <div class="arch-item" onclick="showInfo('materials', this)">循環建材</div>
-                <div class="arch-item" onclick="showInfo('greenery', this)">立體綠化</div>
+            <div class="section-title">
+                <h3 style="margin:0;">🏆 聯盟排行榜</h3>
             </div>
-            <div id="arch-info" class="arch-info">
-                </div>
+            <ul class="leaderboard" id="leaderboard-list">
+                <li class="rank-item">等待登入中...</li>
+            </ul>
         </div>
     </div>
 
-    <script>
-        // 1. 日/夜間模式切換邏輯
-        function toggleTheme() {
-            const body = document.body;
-            // 透過操作 body 的 data-theme 屬性，觸發 CSS 變數的改變
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
+        // 新增 Firebase Auth 模組
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7hJeEXv4aCbcy_56QeBttrqhayKzBvTM",
+            authDomain: "green-1-30461.firebaseapp.com",
+            projectId: "green-1-30461",
+            storageBucket: "green-1-30461.firebasestorage.app",
+            messagingSenderId: "710455398924",
+            appId: "1:710455398924:web:16aab956f5537bcfa61429",
+            measurementId: "G-3TJM9VRQQW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUserId = null; 
+
+        // 處理登入按鈕點擊
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch(error => {
+                console.error("登入失敗:", error);
+                alert("登入失敗，請重試！");
+            });
+        });
+
+        // 監聽登入狀態變化
+        onAuthStateChanged(auth, async (user) => {
+            const statusText = document.getElementById('user-status');
+            
+            if (user) {
+                // 已登入
+                currentUserId = user.uid;
+                loginBtn.style.display = 'none';
+                statusText.innerText = `玩家：${user.displayName} | 載入中...`;
+
+                // 檢查資料庫有沒有這個玩家，沒有就自動建立 (預設 0 分)
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        displayName: user.displayName,
+                        score: 0
+                    });
+                    statusText.innerText = `玩家：${user.displayName} | 0 XP`;
+                } else {
+                    statusText.innerText = `玩家：${user.displayName} | ${userSnap.data().score} XP`;
+                }
+
+                // 登入後才載入排行榜
+                loadLeaderboard();
             } else {
-                body.setAttribute('data-theme', 'dark');
+                // 未登入
+                currentUserId = null;
+                loginBtn.style.display = 'block';
+                statusText.innerText = '請先登入以載入積分';
+                document.getElementById('leaderboard-list').innerHTML = '<li class="rank-item">請先登入以查看排行榜</li>';
+            }
+        });
+
+        // 載入排行榜函數
+        async function loadLeaderboard() {
+            const leaderboardEl = document.getElementById('leaderboard-list');
+            leaderboardEl.innerHTML = '<li class="rank-item">載入排行榜中...</li>';
+
+            try {
+                const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                leaderboardEl.innerHTML = ''; 
+                let rank = 1;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const isMe = doc.id === currentUserId; 
+                    
+                    let rankClass = "rank-num";
+                    if (rank === 1) rankClass += " top-1";
+                    else if (rank === 2) rankClass += " top-2";
+                    else if (rank === 3) rankClass += " top-3";
+
+                    const itemStyle = isMe ? 'style="background-color: var(--secondary); border-radius: 8px; padding: 0.8rem;"' : '';
+                    const nameStyle = isMe ? 'style="font-weight: bold;"' : '';
+
+                    const li = `
+                        <li class="rank-item" ${itemStyle}>
+                            <span class="${rankClass}">${rank}</span>
+                            <div class="player-info" ${nameStyle}>${data.displayName}</div>
+                            <div class="player-score">${data.score} XP</div>
+                        </li>
+                    `;
+                    leaderboardEl.insertAdjacentHTML('beforeend', li);
+                    rank++;
+                });
+            } catch (error) {
+                console.error("讀取排行榜失敗:", error);
             }
         }
 
-        // 2. 進度條計算邏輯
-        function updateScore() {
-            // 選取所有清單中的 checkbox
-            const checkboxes = document.querySelectorAll('#habit-list input[type="checkbox"]');
-            let checkedCount = 0;
-            
-            // 計算被勾選的數量
-            checkboxes.forEach(box => {
-                if (box.checked) {
-                    checkedCount++;
+        // 拍照上傳邏輯 (加入必須登入的檢查)
+        document.querySelectorAll('.verify-input').forEach(input => {
+            input.addEventListener('change', async function(event) {
+                if (!currentUserId) {
+                    alert("請先登入才能解鎖任務！");
+                    this.value = ''; // 清空選擇的檔案
+                    return;
+                }
+                
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const questItem = this.closest('.quest-item');
+                const btnLabel = questItem.querySelector('.verify-btn');
+                const imgPreview = questItem.querySelector('.preview-img');
+                const statusText = questItem.querySelector('.upload-status');
+                const questId = questItem.getAttribute('data-quest-id');
+                const xpValue = questItem.getAttribute('data-xp');
+
+                imgPreview.src = URL.createObjectURL(file);
+                imgPreview.style.display = 'block';
+                btnLabel.style.display = 'none'; 
+                statusText.style.display = 'block'; 
+
+                try {
+                    const fileExtension = file.name.split('.').pop();
+                    const fileName = `verifications/${currentUserId}/${questId}_${Date.now()}.${fileExtension}`;
+                    const storageRef = ref(storage, fileName);
+                    
+                    await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(storageRef);
+
+                    await addDoc(collection(db, "verifications"), {
+                        userId: currentUserId,
+                        questId: questId,
+                        xpReward: Number(xpValue),
+                        imageUrl: downloadURL,
+                        status: "pending", 
+                        timestamp: serverTimestamp()
+                    });
+
+                    statusText.innerText = '✅ 照片已上傳，等待審核給分！';
+                    statusText.style.color = '#2E8B57';
+                } catch (error) {
+                    console.error("上傳失敗:", error);
+                    statusText.innerText = '❌ 上傳失敗，請重試';
+                    btnLabel.style.display = 'block'; 
                 }
             });
-
-            // 計算百分比並更新 DOM 元素
-            const percentage = Math.round((checkedCount / checkboxes.length) * 100);
-            document.getElementById('progress-bar').style.width = percentage + '%';
-            document.getElementById('score-text').innerText = `完成度：${percentage}%`;
-        }
-
-        // 3. 資訊卡片動態載入邏輯
-        // 建立一個資料物件來儲存不同概念的內容
-        const infoData = {
-            passive: "<strong>被動式設計 (Passive Design)：</strong><br>利用建築物本身的座向、開窗位置與遮陽設計，最大化自然採光與通風，藉此減少空調與人造照明的耗能。這是在圖面設計階段就能帶來巨大影響的策略，讓建築學會「呼吸」。",
-            materials: "<strong>循環建材 (Circular Materials)：</strong><br>優先使用可回收、低碳足跡的當地材料（如綠建材標章產品），並考量建築物生命週期結束後的拆解與材料重組潛力，減少營建廢棄物。",
-            greenery: "<strong>立體綠化 (Vertical/Roof Greenery)：</strong><br>透過屋頂薄層綠化或植生牆，不僅能降低都市熱島效應、改善微氣候，還能為建築物提供額外的隔熱層，有效降低室內溫度。"
-        };
-
-        function showInfo(type, element) {
-            // 移除所有按鈕的 active 狀態
-            document.querySelectorAll('.arch-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // 為當前點擊的按鈕加上 active 狀態
-            element.classList.add('active');
-
-            // 顯示資訊區塊並動態寫入對應內容
-            const infoBox = document.getElementById('arch-info');
-            infoBox.style.display = 'block';
-            
-            // 添加簡單的淡入動畫效果
-            infoBox.style.opacity = 0;
-            infoBox.innerHTML = infoData[type];
-            setTimeout(() => {
-                infoBox.style.transition = "opacity 0.5s";
-                infoBox.style.opacity = 1;
-            }, 50);
-        }
+        });
     </script>
 </body>
 </html>
