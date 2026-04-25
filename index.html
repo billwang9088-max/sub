@@ -103,15 +103,15 @@
         appId: "1:710455398924:web:16aab956f5537bcfa61429"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const functions = getFunctions(app);
-    const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
+ // 找到這幾行
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-    let confirmationResult = null;
-    let currentUserId = null;
+// 🌟 請修改這兩行：明確指定地區為 'us-central1'
+const functions = getFunctions(app, 'us-central1'); 
+const verifyQuestImageAPI = httpsCallable(functions, 'verifyQuestImage');
 
     // --- 登入控制區 ---
 
